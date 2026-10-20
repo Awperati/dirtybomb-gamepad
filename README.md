@@ -45,7 +45,7 @@ Settings are saved next to the .exe in `dbpad_settings.json`.
 ## Tips
 
 - **Steam Input:** if you start Dirty Bomb from Steam with Steam Input on for your controller, Steam may translate the pad too. Turn Steam Input off for Dirty Bomb (Properties, Controller), or leave this app off.
-- **Xbox pads:** Unreal Engine 3 has a few leftover Xbox bindings in Dirty Bomb's input file. If a button does two things, clear that button's `XboxTypeS_` line in `Documents\My Games\UnrealEngine3\ShooterGame\Config\ShooterInput.ini`.
+- **A button does two things?** For example, holding R2 makes the game aim. That means Dirty Bomb can see your controller itself: an Xbox pad, or a PlayStation pad through Steam Input or DS4Windows. Its leftover Unreal Engine 3 Xbox bindings then fire alongside this app. Close Dirty Bomb and click **Turn them off** in the app's Status box. That comments out the game's `XboxTypeS_` bindings in `Documents\My Games\UnrealEngine3\ShooterGame\Config\ShooterInput.ini`, saving a backup as `ShooterInput.ini.dbpad-backup`. **Turn them back on** undoes it exactly. Keyboard and mouse bindings are never touched.
 - **Rebound keys in game?** Pick the matching action in the app, or edit `dbpad/actions.py` and build.
 - **Online play:** Dirty Bomb uses EasyAntiCheat. This app only sends normal keyboard and mouse input through Windows (`SendInput`), the same way macro keyboards and accessibility tools do. It doesn't touch the game's memory or files. Use it at your own risk all the same.
 
