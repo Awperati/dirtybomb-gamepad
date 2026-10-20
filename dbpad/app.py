@@ -10,14 +10,14 @@ import sys
 import threading
 import time
 import tkinter as tk
-from tkinter import ttk
+from tkinter import messagebox, ttk
 
 from .actions import ACTIONS, BUTTONS, DEFAULT_SETTINGS
 from .mapper import Mapper
-from . import sendinput
+from . import gameconfig, sendinput
 
 APP_NAME = "Dirty Bomb Gamepad"
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 TICK = 1 / 250
 
 BG, PANEL, FG, MUTED, ACCENT, ON, OFF = "#10161f", "#18212d", "#e6edf5", "#8a9bb0", "#3aa0ff", "#46d17c", "#e05d5d"
@@ -163,6 +163,14 @@ class App:
         self.focus_var = tk.BooleanVar(value=self.settings["only_when_game_focused"])
         ttk.Checkbutton(p, text="Only while Dirty Bomb is in front (recommended)", variable=self.focus_var,
                         command=lambda: self._set("only_when_game_focused", self.focus_var.get())).pack(anchor="w", pady=(8, 0))
+        # the game's own (Xbox) controller bindings: off stops double input, e.g. holding R2 making the game aim
+        nat = ttk.Frame(p, style="Panel.TFrame")
+        nat.pack(fill="x", pady=(8, 0))
+        self.native_lbl = ttk.Label(nat, text="", style="Muted.TLabel")
+        self.native_lbl.pack(side="left")
+        self.native_btn = ttk.Button(nat, command=self.toggle_native)
+        self.native_btn.pack(side="right")
+        self._show_native()
 
         # aiming
         p = self._panel(top, "Aiming (right stick)", side="right")
@@ -228,6 +236,39 @@ class App:
 
     def toggle(self):
         self._set("enabled", not self.settings["enabled"])
+
+    def _show_native(self):
+        st = gameconfig.status(gameconfig.input_ini())
+        if st == "missing":
+            self.native_lbl.config(text="Dirty Bomb's settings file wasn't found (run the game once).")
+            self.native_btn.config(text="Check again")
+        elif st == "on":
+            self.native_lbl.config(text="Dirty Bomb's own controller bindings: ON (can double up inputs)")
+            self.native_btn.config(text="Turn them off")
+        else:
+            self.native_lbl.config(text="Dirty Bomb's own controller bindings: OFF (only this app drives the game)")
+            self.native_btn.config(text="Turn them back on")
+
+    def toggle_native(self):
+        path = gameconfig.input_ini()
+        st = gameconfig.status(path)
+        if st == "missing":
+            return self._show_native()
+        if gameconfig.game_running():
+            messagebox.showwarning(APP_NAME, "Close Dirty Bomb first.\n\nThe game saves its settings file when it exits, which would undo this.")
+            return
+        try:
+            if st == "on":
+                n = gameconfig.disable(path)
+                messagebox.showinfo(APP_NAME, f"Turned off {n} of Dirty Bomb's own controller bindings.\n\n"
+                                              f"A backup was saved as\n{path + gameconfig.BACKUP_SUFFIX}\n\n"
+                                              "Now only this app drives the game, so holding R2 just fires.")
+            else:
+                n = gameconfig.enable(path)
+                messagebox.showinfo(APP_NAME, f"Turned {n} of Dirty Bomb's own controller bindings back on.")
+        except OSError as e:
+            messagebox.showerror(APP_NAME, f"Couldn't change the settings file:\n{e}")
+        self._show_native()
 
     def reset(self):
         defaults = copy.deepcopy(DEFAULT_SETTINGS)
