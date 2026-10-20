@@ -24,7 +24,7 @@ Windows SmartScreen or your antivirus may warn you, because the .exe isn't code-
 |---|---|---|
 | R2 | Fire | Left mouse |
 | L2 | Aim (ironsights), and slows the look while held | Right mouse |
-| Cross ✕ | Jump | Space |
+| Cross ✕ | Tap: jump. Hold a moment: long jump | Space / Left Alt* |
 | Circle ○ | Crouch | Left Ctrl |
 | Square □ | Tap: reload. Hold: use / revive / plant / defuse | R / F |
 | Triangle △ | Next weapon | Mouse wheel |
@@ -37,6 +37,12 @@ Windows SmartScreen or your antivirus may warn you, because the .exe isn't code-
 | Create / Share | Scoreboard | Tab |
 | Touchpad click | Quick chat | V |
 | Mute | Push to talk | X |
+
+\* Long jump presses **Left Alt**. Dirty Bomb doesn't bind Alt by default. Bind it yourself by adding this line under `[ShooterGame.SGPlayerInputPawn]` in `ShooterInput.ini`, with the game closed:
+
+```
+Bindings=(Name="LeftAlt",Command="Duck | Jump")
+```
 
 Any button can be changed in the app. Each button has a **tap** action and an optional **hold** action, like Square above.
 

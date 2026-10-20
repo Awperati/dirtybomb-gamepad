@@ -12,12 +12,12 @@ import time
 import tkinter as tk
 from tkinter import messagebox, ttk
 
-from .actions import ACTIONS, BUTTONS, DEFAULT_SETTINGS
+from .actions import ACTIONS, BUTTONS, DEFAULT_SETTINGS, SETTINGS_VERSION
 from .mapper import Mapper
 from . import gameconfig, sendinput
 
 APP_NAME = "Dirty Bomb Gamepad"
-VERSION = "1.0.1"
+VERSION = "1.0.2"
 TICK = 1 / 250
 
 BG, PANEL, FG, MUTED, ACCENT, ON, OFF = "#10161f", "#18212d", "#e6edf5", "#8a9bb0", "#3aa0ff", "#46d17c", "#e05d5d"
@@ -34,7 +34,11 @@ def load_settings():
         with open(settings_path(), "r", encoding="utf-8") as f:
             saved = json.load(f)
         binds = s["bindings"]
-        binds.update({k: v for k, v in saved.pop("bindings", {}).items() if k in binds})
+        saved_binds = saved.pop("bindings", {})
+        if saved.get("version", 1) < 2 and saved_binds.get("a") == {"press": "Jump", "hold": "None"}:
+            saved_binds.pop("a")        # 1.0.2: Cross gains hold-for-long-jump, unless you had changed it yourself
+        binds.update({k: v for k, v in saved_binds.items() if k in binds})
+        saved["version"] = SETTINGS_VERSION
         s.update({k: v for k, v in saved.items() if k in s})
     except (OSError, ValueError):
         pass

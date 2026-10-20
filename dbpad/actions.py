@@ -10,6 +10,7 @@ ACTIONS = {
     "Fire": "MOUSE_LEFT",
     "Aim (ironsights)": "MOUSE_RIGHT",
     "Jump": "SPACE",
+    "Long jump (Alt)": "LALT",          # Left Alt bound to "Duck | Jump" in Dirty Bomb (see README)
     "Crouch": "LCTRL",
     "Sprint (hold)": "LSHIFT",
     "Sprint (toggle)": "LSHIFT",          # special: press once to sprint, again to stop
@@ -63,7 +64,7 @@ BUTTONS = [
 
 # Default layout, modelled on PlayStation shooters.
 DEFAULT_BINDINGS = {
-    "a": {"press": "Jump", "hold": "None"},
+    "a": {"press": "Jump", "hold": "Long jump (Alt)", "hold_time": 0.18},   # tap jumps, hold a moment for a long jump
     "b": {"press": "Crouch", "hold": "None"},
     "x": {"press": "Reload", "hold": "Use / revive / plant"},     # tap reloads, hold uses / revives / plants
     "y": {"press": "Next weapon", "hold": "None"},
@@ -84,7 +85,10 @@ DEFAULT_BINDINGS = {
     "guide": {"press": "None", "hold": "None"},
 }
 
+SETTINGS_VERSION = 2
+
 DEFAULT_SETTINGS = {
+    "version": SETTINGS_VERSION,
     "enabled": True,
     "only_when_game_focused": True,
     "look_speed": 1400,        # mouse pixels a second with the right stick pushed all the way
@@ -95,6 +99,6 @@ DEFAULT_SETTINGS = {
     "invert_y": False,
     "move_deadzone": 0.35,     # how far the left stick goes before W/A/S/D press
     "trigger_threshold": 0.3,
-    "hold_time": 0.30,         # seconds a button must be held for its "hold" action
+    "hold_time": 0.30,         # seconds a button must be held for its "hold" action (a button can set its own)
     "bindings": DEFAULT_BINDINGS,
 }

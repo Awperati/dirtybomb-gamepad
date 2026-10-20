@@ -95,7 +95,7 @@ class Mapper:
                 # tap = the press action; held past hold_time = the hold action, kept until let go
                 if now:
                     self.down_for[name] = self.down_for.get(name, 0.0) + (dt if was else 0.0)
-                    if not self.hold_fired.get(name) and self.down_for[name] >= s["hold_time"]:
+                    if not self.hold_fired.get(name) and self.down_for[name] >= bind.get("hold_time", s["hold_time"]):
                         self.hold_fired[name] = True
                         self._action_down(hold, out)
                 elif was:

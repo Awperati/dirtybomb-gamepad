@@ -14,10 +14,21 @@ class MapperTest(unittest.TestCase):
         self.s = copy.deepcopy(DEFAULT_SETTINGS)
         self.m = Mapper(self.s)
 
-    def test_cross_jumps_while_held(self):
-        self.assertEqual(self.m.update(state(["a"]), 0.004), [("down", "SPACE")])
+    def test_cross_tap_jumps(self):
         self.assertEqual(self.m.update(state(["a"]), 0.004), [])
-        self.assertEqual(self.m.update(state(), 0.004), [("up", "SPACE")])
+        self.assertEqual(self.m.update(state(["a"]), 0.004), [])
+        self.assertEqual(self.m.update(state(), 0.004), [("down", "SPACE"), ("up", "SPACE")])
+
+    def test_cross_held_long_jumps_with_alt(self):
+        ev = []
+        for _ in range(50):                        # 0.2 s: past Cross's own 0.18 s hold time
+            ev += self.m.update(state(["a"]), 0.004)
+        self.assertEqual(ev, [("down", "LALT")])
+        self.assertEqual(self.m.update(state(), 0.004), [("up", "LALT")])
+
+    def test_a_plain_button_still_holds_its_key(self):
+        self.assertEqual(self.m.update(state(["b"]), 0.004), [("down", "LCTRL")])
+        self.assertEqual(self.m.update(state(), 0.004), [("up", "LCTRL")])
 
     def test_r2_fires_past_the_threshold_only(self):
         self.assertEqual(self.m.update(state(righttrigger=0.1), 0.004), [])
@@ -48,11 +59,11 @@ class MapperTest(unittest.TestCase):
         self.assertEqual(self.m.update(state(leftx=0.1, lefty=-0.8), 0.004), [("up", "A")])
 
     def test_two_buttons_on_one_key_hold_it_together(self):
-        self.s["bindings"]["dpright"]["press"] = "Jump"       # same as Cross
-        self.m.update(state(["a"]), 0.004)
-        self.assertEqual(self.m.update(state(["a", "dpright"]), 0.004), [])
+        self.s["bindings"]["dpright"]["press"] = "Crouch"     # same as Circle
+        self.m.update(state(["b"]), 0.004)
+        self.assertEqual(self.m.update(state(["b", "dpright"]), 0.004), [])
         self.assertEqual(self.m.update(state(["dpright"]), 0.004), [])
-        self.assertEqual(self.m.update(state(), 0.004), [("up", "SPACE")])
+        self.assertEqual(self.m.update(state(), 0.004), [("up", "LCTRL")])
 
     def test_right_stick_moves_the_mouse(self):
         total = [0, 0]
@@ -70,8 +81,8 @@ class MapperTest(unittest.TestCase):
         self.assertAlmostEqual(moved, self.s["look_speed"] * self.s["aim_scale"], delta=2)
 
     def test_release_all_lets_go_of_everything(self):
-        self.m.update(state(["a", "leftstick"], lefty=-1.0), 0.004)
-        self.assertEqual(sorted(self.m.release_all()), [("up", "LSHIFT"), ("up", "SPACE"), ("up", "W")])
+        self.m.update(state(["b", "leftstick"], lefty=-1.0), 0.004)
+        self.assertEqual(sorted(self.m.release_all()), [("up", "LCTRL"), ("up", "LSHIFT"), ("up", "W")])
 
 
 if __name__ == "__main__":
